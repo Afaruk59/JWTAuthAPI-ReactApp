@@ -1,36 +1,39 @@
-GET http://localhost:5294/api/User
-Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE3YTEzNjEzLTY2OGMtNGU3Ni1hZDJiLTk2MGRkNzNlNjZkYSIsImVtYWlsIjoiYWZhcnVrNTlAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImFmYXJ1azU5IiwianRpIjoiOTg0MzhkZGItOWM5Yy00ZWMxLWEzZjAtNzcyOTM5MTJjMzkyIiwiYXVkIjpbInd3dy5hdXRoc2VydmVyLmNvbSIsInd3dy5taW5pYXBpMS5jb20iLCJ3d3cubWluaWFwaTIuY29tIl0sIm5iZiI6MTc1NzA3NjU1NSwiZXhwIjoxNzU3MDc2ODU1LCJpc3MiOiJ3d3cuYXV0aHNlcnZlci5jb20ifQ.YsPpBkwmCU4LyPcDOlWq8n9k82Jr8np6wHJUUX5eHHg
+GET http://localhost:5294/api/User/GetUser
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE3YTEzNjEzLTY2OGMtNGU3Ni1hZDJiLTk2MGRkNzNlNjZkYSIsImVtYWlsIjoiYWZhcnVrNTlAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImFmYXJ1azU5IiwianRpIjoiNmMzZmU3NjAtN2Y2YS00NWMyLWI5ZTItMGZjMjNiNjQzZWU5IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImF1ZCI6WyJ3d3cuYXV0aHNlcnZlci5jb20iLCJ3d3cubWluaWFwaTEuY29tIiwid3d3Lm1pbmlhcGkyLmNvbSJdLCJuYmYiOjE3NTc0Mjc4ODUsImV4cCI6MTc1NzQyODE4NSwiaXNzIjoid3d3LmF1dGhzZXJ2ZXIuY29tIn0.fa3eW3LUMJuFIkarkvOrdIM23S_K-4ERJ0umfvWZOSk
 
 ### Token olustur
 POST http://localhost:5294/api/Auth/CreateToken
-   Content-Type: application/json
+Content-Type: application/json
 
 {
   "email": "afaruk59@gmail.com",
   "password": "Afaruk59**"
 }
 ### kullanıcı olustur
-POST http://localhost:5294/api/User
-   Content-Type: application/json
+POST http://localhost:5294/api/User/CreateUser
+Content-Type: application/json
 
 {
-  "userName": "afaruk59",
-  "email": "afaruk59@gmail.com",
-  "password": "Afaruk59**"
+  "userName": "suhis",
+  "email": "suhis@gmail.com",
+  "password": "Suhis123**"
 }
 ### Refresh ile token yenileme
 POST http://localhost:5294/api/Auth/CreateTokenByRefreshToken
-   Content-Type: application/json
+Content-Type: application/json
 
 {
-  "token" : "ZpA6XhzNuGOnza3h/ak2c13i29L1XHLM5XOZtXKqKr4="
+  "token" : "UouLQ0ApysuCUC3a2jHvETU3gJT5nPzDVlBweMrH/wg="
 }
-### Refresh Token geri alma
+### Refresh Token geri alma (Yukarıdaki istekten dönen YENİ refresh token'ı kullan)
 POST http://localhost:5294/api/Auth/RevokeRefreshToken
-   Content-Type: application/json
+Content-Type: application/json
 
 {
-  "token" : "1uRv7YjLToec3+1VwYmqZaHI29o9YSNaPzeWMflmLBg="
+  "token" : "1DpGMbknsDRYN8ogRA4z8K/bpq3n9WpwUZinm4XGrcQ="
 }
-### userrole
-POST http://localhost:5294/api/User/CreateUserRoles/CreateUserRoles/afaruk59
+### Kullanıcıya rol atama (Manager rolü)
+POST http://localhost:5294/api/User/AssignRole/afaruk59/Manager
+
+### Kullanıcıya rol atama (Admin rolü)  
+POST http://localhost:5294/api/User/AssignRole/afaruk59/Admin

@@ -10,26 +10,30 @@ namespace AuthServer.Service.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<UserApp> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    public UserService(UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager)
+    
+    public UserService(UserManager<UserApp> userManager)
     {
         _userManager = userManager;
-        _roleManager = roleManager;
     }
     public async Task<Response<UserAppDto>> CreateUserAsync(CreateUserDto createUserDto)
     {
-        var user = new UserApp { UserName = createUserDto.UserName, Email = createUserDto.Email, City = null };
+        var user = new UserApp { 
+            UserName = createUserDto.UserName, 
+            Email = createUserDto.Email,
+            Role = "User" // Varsayılan rol "User"
+        };
         var result = await _userManager.CreateAsync(user, createUserDto.Password);
         if (!result.Succeeded)
         {
             return Response<UserAppDto>.Fail(string.Join(",", result.Errors.Select(x => x.Description)), 400, true);
         }
+
         var userDto = new UserAppDto
         {
             Id = user.Id,
             UserName = user.UserName,
             Email = user.Email,
-            City = user.City
+            Role = user.Role
         };
         return Response<UserAppDto>.Success(userDto, 200);
     }
@@ -45,24 +49,40 @@ public class UserService : IUserService
             Id = user.Id,
             UserName = user.UserName,
             Email = user.Email,
-            City = user.City
+            Role = user.Role
         };
         return Response<UserAppDto>.Success(userDto, 200);
     }
 
-    public async Task<Response<NoDataDto>> CreateUserRoles(string userName)
+    public async Task<Response<NoDataDto>> AssignRoleToUser(string userName, string roleName)
     {
-        if (!await _roleManager.RoleExistsAsync("Admin"))
+        // Geçerli rol kontrolü
+        string[] validRoles = { "User", "Manager", "Admin" };
+        if (!validRoles.Contains(roleName))
         {
-            await _roleManager.CreateAsync(new() { Name = "Admin" });
+            return Response<NoDataDto>.Fail($"Invalid role: {roleName}. Valid roles: {string.Join(", ", validRoles)}", 400, true);
         }
-        if (!await _roleManager.RoleExistsAsync("User"))
-        {
-            await _roleManager.CreateAsync(new() { Name = "User" });
-        }
+
         var user = await _userManager.FindByNameAsync(userName);
-        await _userManager.AddToRoleAsync(user, "Admin");
-        await _userManager.AddToRoleAsync(user, "User");
-        return Response<NoDataDto>.Success(StatusCodes.Status201Created);
+        if (user == null)
+        {
+            return Response<NoDataDto>.Fail("User not found.", 404, true);
+        }
+
+        // Rol zaten atanmış mı kontrol et
+        if (user.Role == roleName)
+        {
+            return Response<NoDataDto>.Fail($"User already has role: {roleName}", 400, true);
+        }
+
+        // Kullanıcının rolünü güncelle (tek rol sistemi)
+        user.Role = roleName;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            return Response<NoDataDto>.Fail(string.Join(",", result.Errors.Select(x => x.Description)), 400, true);
+        }
+
+        return Response<NoDataDto>.Success(200);
     }
 }

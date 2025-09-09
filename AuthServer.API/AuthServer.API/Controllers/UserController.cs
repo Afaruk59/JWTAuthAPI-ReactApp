@@ -26,9 +26,9 @@ public class UserController : CustomBaseControler
     {
         return ActionResultInstance(await _userService.GetUserByNameAsync(HttpContext.User.Identity.Name));
     }
-    [HttpPost("CreateUserRoles/{userName}")]
-    public async Task<IActionResult> CreateUserRoles(string userName)
+    [HttpPost("{userName}/{roleName}")]
+    public async Task<IActionResult> AssignRole(string userName, string roleName)
     {
-        return ActionResultInstance(await _userService.CreateUserRoles(userName));
+        return ActionResultInstance(await _userService.AssignRoleToUser(userName, roleName));
     }
 }

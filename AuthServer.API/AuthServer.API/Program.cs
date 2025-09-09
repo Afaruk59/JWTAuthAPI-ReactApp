@@ -59,7 +59,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     });
 });
 
-builder.Services.AddIdentity<UserApp, IdentityRole>(Opt =>
+// Identity'yi sadece kullanıcı yönetimi için kullan, rol sistemi olmadan
+builder.Services.AddIdentityCore<UserApp>(Opt =>
 {
     Opt.User.RequireUniqueEmail = true;
     Opt.Password.RequireNonAlphanumeric = false;
@@ -70,6 +71,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
+
+// Rol sistemi artık kullanılmıyor - kaldırıldı
 
 app.UseCustomException();
 

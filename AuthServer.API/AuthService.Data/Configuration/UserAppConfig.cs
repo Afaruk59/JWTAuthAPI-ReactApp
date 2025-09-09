@@ -9,6 +9,10 @@ public class UserAppConfig : IEntityTypeConfiguration<UserApp>
 {
     public void Configure(EntityTypeBuilder<UserApp> builder)
     {
-        builder.Property(x => x.City).HasMaxLength(50).IsRequired(false);
+        // Role özelliği konfigürasyonu
+        builder.Property(x => x.Role)
+            .IsRequired()
+            .HasMaxLength(50)
+            .HasDefaultValue("User");
     }
 }

@@ -5,5 +5,5 @@ namespace AuthServer.Core.Models;
 
 public class UserApp : IdentityUser
 {
-    public string? City { get; set; }
+    public string Role { get; set; } = "User"; // Varsayılan rol "User"
 }

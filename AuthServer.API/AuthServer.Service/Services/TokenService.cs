@@ -35,21 +35,18 @@ public class TokenService : ITokenService
         return Convert.ToBase64String(numberByte);
     }
 
-    private async Task<IEnumerable<Claim>> GetClaims(UserApp userApp,
-     List<String> audiences)
+    private IEnumerable<Claim> GetClaims(UserApp userApp, List<String> audiences)
     {
-
-        var userRoles = await _userManager.GetRolesAsync(userApp);
         var userList = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, userApp.Id),
-            new(JwtRegisteredClaimNames.Email, userApp.Email),
-            new(ClaimTypes.Name, userApp.UserName),
+            new(JwtRegisteredClaimNames.Email, userApp.Email ?? ""),
+            new(ClaimTypes.Name, userApp.UserName ?? ""),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("city" , userApp.City)
+            new(ClaimTypes.Role, userApp.Role) // Basit rol property'sini kullan
         };
+        
         userList.AddRange(audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
-        userList.AddRange(userRoles.Select(x => new Claim(ClaimTypes.Role, x)));
         return userList;
     }
 
@@ -64,7 +61,7 @@ public class TokenService : ITokenService
         SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
         JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(issuer: _tokenOption.Issuer, expires: accessTokenExpiration,
-        notBefore: DateTime.Now, claims: GetClaims(userApp, _tokenOption.Audience).Result, signingCredentials: signingCredentials);
+        notBefore: DateTime.Now, claims: GetClaims(userApp, _tokenOption.Audience), signingCredentials: signingCredentials);
 
         var handler = new JwtSecurityTokenHandler();
         var token = handler.WriteToken(jwtSecurityToken);
