@@ -1,5 +1,4 @@
 using System;
-using AuthServer.Core.Configuration;
 using AuthServer.Core.Dtos;
 using AuthServer.Core.Models;
 using AuthServer.Core.Repositories;
@@ -14,14 +13,12 @@ namespace AuthServer.Service.Services;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly List<Client> _clients;
     private readonly ITokenService _tokenService;
     private readonly UserManager<UserApp> _userManager;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGenericRepository<UserRefreshToken> _userRefreshTokenService;
-    public AuthenticationService(IOptions<List<Client>> optionsClient, ITokenService tokenService, UserManager<UserApp> userManager, IUnitOfWork unitOfWork, IGenericRepository<UserRefreshToken> userRefreshTokenService)
+    public AuthenticationService(ITokenService tokenService, UserManager<UserApp> userManager, IUnitOfWork unitOfWork, IGenericRepository<UserRefreshToken> userRefreshTokenService)
     {
-        _clients = optionsClient.Value;
         _tokenService = tokenService;
         _userRefreshTokenService = userRefreshTokenService;
         _userManager = userManager;
@@ -74,16 +71,6 @@ public class AuthenticationService : IAuthenticationService
         return Response<TokenDto>.Success(token, 200);
     }
 
-    public Response<ClientTokenDto> CreateTokenByClient(ClientLoginDto clientLoginDto)
-    {
-        var client = _clients.SingleOrDefault(x => x.Id == clientLoginDto.ClientId && x.Secret == clientLoginDto.ClientSecret);
-        if (client == null)
-        {
-            return Response<ClientTokenDto>.Fail("ClientId or ClientSecret not found.", 404, true);
-        }
-        var token = _tokenService.CreateTokenByClient(client);
-        return Response<ClientTokenDto>.Success(token, 200);
-    }
 
     public async Task<Response<NoDataDto>> RevokeRefreshToken(string refreshToken)
     {

@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using AuthServer.Core.Configuration;
 using AuthServer.Core.Models;
 using AuthServer.Core.Repositories;
 using AuthServer.Core.Services;
@@ -29,7 +28,6 @@ builder.Services.AddAuthorization();
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOption"));
 var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
 
-builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clients"));
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
