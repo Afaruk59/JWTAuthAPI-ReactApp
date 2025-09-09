@@ -38,6 +38,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           },
         },
         {
+          key: "/admin/newUser",
+          icon: <UserAddOutlined />,
+          label: "Yeni Kullanıcı",
+          onClick: () => {
+            navigate("/admin/newUser");
+          },
+        },
+        {
           key: "logout",
           icon: <LoginOutlined />,
           label: "Çıkış Yap",
@@ -101,7 +109,6 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         },
       ];
     } else {
-      // Login ve register sayfaları için
       return [
         {
           key: "/login",
@@ -132,6 +139,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
     if (currentPath === "/admin/users") {
       return "Kullanıcılar";
+    } else if (currentPath === "/admin/newUser") {
+      return "Yeni Kullanıcı";
     } else if (currentPath === "/manager/users") {
       return "Kullanıcılar";
     } else if (currentPath === "/manager/orders") {
@@ -145,7 +154,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     } else if (currentPath === "/register") {
       return "Kayıt Ol";
     } else {
-      return "Panel";
+      return "";
     }
   };
 
