@@ -25,6 +25,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.UseCustomValidationResponse();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("react", p => p
+        .WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
+});
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOption"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
@@ -86,6 +94,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors("react");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,18 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LoginOutlined,
   ShopOutlined,
   TeamOutlined,
   UserAddOutlined,
   UserOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Layout, Menu, theme, Typography, Avatar } from "antd";
+import { Layout, Menu, theme, Typography, Avatar, message } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 function MainLayout({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL as string;
+
+  const logout = async () => {
+    try {
+      const refreshToken =
+        localStorage.getItem("refreshToken") ||
+        sessionStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await axios.post(`${apiUrl}/api/Auth/RevokeRefreshToken`, {
+          token: refreshToken,
+        });
+      }
+    } catch {
+      // ignore
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
+      message.success("Çıkış yapıldı");
+      navigate("/login", { replace: true });
+    }
+  };
   const siderStyle: React.CSSProperties = {
     overflow: "auto",
     height: "100vh",
@@ -23,6 +52,20 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     scrollbarWidth: "thin",
     scrollbarGutter: "auto",
   };
+
+  const getUserInfo = async () => {
+    const accessToken =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
+    if (!accessToken) return;
+    const { data } = await axios.get(`${apiUrl}/api/User/GetUser`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    setUserInfo(data?.data);
+  };
+  useEffect(() => {
+    getUserInfo();
+  }, []);
 
   const getSidebarItems = (): MenuProps["items"] => {
     const currentPath = pathname;
@@ -50,7 +93,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           icon: <LoginOutlined />,
           label: "Çıkış Yap",
           onClick: () => {
-            navigate("/login");
+            logout();
           },
         },
       ];
@@ -77,7 +120,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           icon: <LoginOutlined />,
           label: "Çıkış Yap",
           onClick: () => {
-            navigate("/login");
+            logout();
           },
         },
       ];
@@ -104,7 +147,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           icon: <LoginOutlined />,
           label: "Çıkış Yap",
           onClick: () => {
-            navigate("/login");
+            logout();
           },
         },
       ];
@@ -153,14 +196,13 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       return "Giriş Yap";
     } else if (currentPath === "/register") {
       return "Kayıt Ol";
+    } else if (currentPath === "/changePassword") {
+      return "Şifre Değiştir";
     } else {
       return "";
     }
   };
 
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
   return (
     <Layout hasSider>
       <Sider
@@ -185,10 +227,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
               style={{ display: "flex", flexDirection: "column", minWidth: 0 }}
             >
               <Typography.Text strong ellipsis>
-                Ahmet Faruk
+                {userInfo?.userName}
               </Typography.Text>
               <Typography.Text type="secondary" ellipsis>
-                Admin
+                {userInfo?.role}
               </Typography.Text>
             </div>
           </div>

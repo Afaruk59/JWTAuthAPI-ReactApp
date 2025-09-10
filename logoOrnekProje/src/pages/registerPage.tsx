@@ -1,15 +1,33 @@
 import { Form, Input, Button, message, Typography } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function RegisterPage() {
-  const onFinish = (values: any) => {
-    console.log("Kayıt bilgileri:", values);
-    message.success("Kayıt başarılı!");
-  };
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_BASE_URL as string;
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Kayıt hatası:", errorInfo);
-    message.error("Kayıt yapılamadı!");
+  const handleSubmit = async (values: any) => {
+    try {
+      const { data } = await axios.post(`${apiUrl}/api/User/CreateUser`, {
+        email: values.email,
+        userName: values.username,
+      });
+
+      if (data?.statusCode >= 200 && data?.statusCode < 300) {
+        message.success(
+          "Kayıt alındı. Geçici şifre e‑postanıza gönderildi. Lütfen şifrenizi belirleyin."
+        );
+        navigate("/changePassword");
+      } else {
+        const errMsg = data?.error?.errors?.join(", ") ?? "Kayıt başarısız.";
+        message.error(errMsg);
+      }
+    } catch (error: any) {
+      const errMsg =
+        error?.response?.data?.error?.errors?.join(", ") ??
+        "Bir hata oluştu. Lütfen tekrar deneyin.";
+      message.error(errMsg);
+    }
   };
   return (
     <div
@@ -25,14 +43,8 @@ function RegisterPage() {
       <Form
         size="large"
         labelCol={{ span: 8 }}
-        initialValues={{
-          username: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        initialValues={{ username: "", email: "" }}
+        onFinish={handleSubmit}
         autoComplete="off"
       >
         <Form.Item
@@ -53,34 +65,6 @@ function RegisterPage() {
           ]}
         >
           <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Şifre"
-          name="password"
-          rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]}
-        >
-          <Input.Password />
-        </Form.Item>
-
-        <Form.Item
-          label="Tekrar Şifre"
-          name="confirmPassword"
-          rules={[
-            { required: true, message: "Lütfen tekrar şifrenizi girin!" },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(new Error("Şifreler eşleşmiyor!"));
-              },
-            }),
-          ]}
-          dependencies={["password"]}
-          hasFeedback
-        >
-          <Input.Password />
         </Form.Item>
 
         <Form.Item style={{ display: "flex", justifyContent: "center" }}>
