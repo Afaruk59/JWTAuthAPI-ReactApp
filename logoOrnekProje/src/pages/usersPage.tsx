@@ -7,6 +7,7 @@ function usersPage() {
   const [users, setUsers] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
   const getCurrentUserIdFromToken = (): string | null => {
     try {
@@ -29,6 +30,31 @@ function usersPage() {
         ] ||
         obj["nameid"] ||
         obj["sub"] ||
+        null
+      );
+    } catch {
+      return null;
+    }
+  };
+
+  const getCurrentUserRoleFromToken = (): string | null => {
+    try {
+      const accessToken =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
+      if (!accessToken) return null;
+      const payload = accessToken.split(".")[1];
+      const b64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+      const json = decodeURIComponent(
+        atob(b64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const obj = JSON.parse(json);
+      return (
+        obj["role"] ||
+        obj["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
         null
       );
     } catch {
@@ -146,6 +172,7 @@ function usersPage() {
 
   useEffect(() => {
     setCurrentUserId(getCurrentUserIdFromToken());
+    setCurrentUserRole(getCurrentUserRoleFromToken());
     getUsers();
   }, []);
 
@@ -194,7 +221,7 @@ function usersPage() {
           }}
         >
           <Typography.Text>{record.role}</Typography.Text>
-          {record.id !== currentUserId && (
+          {record.id !== currentUserId && currentUserRole !== "Manager" && (
             <Button
               type="primary"
               size="small"
@@ -220,24 +247,34 @@ function usersPage() {
         );
       },
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      render: (_: any, record: any) => (
-        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-          {record.id !== currentUserId && (
-            <Button
-              type="primary"
-              danger
-              onClick={() => handleDelete(record.userName)}
-            >
-              Sil
-            </Button>
-          )}
-        </div>
-      ),
-    },
+    ...(currentUserRole !== "Manager"
+      ? [
+          {
+            title: "Action",
+            dataIndex: "action",
+            key: "action",
+            render: (_: any, record: any) => (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  justifyContent: "center",
+                }}
+              >
+                {record.id !== currentUserId && (
+                  <Button
+                    type="primary"
+                    danger
+                    onClick={() => handleDelete(record.userName)}
+                  >
+                    Sil
+                  </Button>
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (

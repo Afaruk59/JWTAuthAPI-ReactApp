@@ -37,7 +37,7 @@ public class UserController : CustomBaseControler
     {
         return ActionResultInstance(await _userService.AssignRoleToUser(userName, roleName));
     }
-    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Manager")]
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
