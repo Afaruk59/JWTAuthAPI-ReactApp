@@ -51,6 +51,11 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(loginDto.Email);
         if (user == null) return Response<TokenDto>.Fail("Email or Password is wrong", 400, true);
 
+        if (!user.IsRegistrationCompleted)
+        {
+            return Response<TokenDto>.Fail("Registration is not completed.", 400, true);
+        }
+
         if (!await _userManager.CheckPasswordAsync(user, loginDto.password))
         {
             return Response<TokenDto>.Fail("Email or Password is wrong", 400, true);

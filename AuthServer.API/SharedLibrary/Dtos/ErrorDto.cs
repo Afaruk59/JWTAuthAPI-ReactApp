@@ -4,7 +4,7 @@ namespace SharedLibrary.Dtos;
 
 public class ErrorDto
 {
-    public List<String> Errors = new List<string>();
+    public List<string> Errors { get; set; } = new List<string>();
     public bool IsShow { get; set; }
     public ErrorDto(string error, bool isShow)
     {

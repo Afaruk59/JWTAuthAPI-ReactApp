@@ -1,22 +1,30 @@
 GET http://localhost:5294/api/User/GetUser
-Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE3YTEzNjEzLTY2OGMtNGU3Ni1hZDJiLTk2MGRkNzNlNjZkYSIsImVtYWlsIjoiYWZhcnVrNTlAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImFmYXJ1azU5IiwianRpIjoiNmMzZmU3NjAtN2Y2YS00NWMyLWI5ZTItMGZjMjNiNjQzZWU5IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImF1ZCI6WyJ3d3cuYXV0aHNlcnZlci5jb20iLCJ3d3cubWluaWFwaTEuY29tIiwid3d3Lm1pbmlhcGkyLmNvbSJdLCJuYmYiOjE3NTc0Mjc4ODUsImV4cCI6MTc1NzQyODE4NSwiaXNzIjoid3d3LmF1dGhzZXJ2ZXIuY29tIn0.fa3eW3LUMJuFIkarkvOrdIM23S_K-4ERJ0umfvWZOSk
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjA4M2NlY2ZkLTM4N2QtNDQ1ZS04OWYyLWZmM2MwYmQ5NjNhNSIsImVtYWlsIjoiYWZrdXJ0a2FkaXJvZ2x1QGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhaG1ldGFobWV0IiwianRpIjoiNjhjYzEzNjItOTFiNS00OTY0LTg5OTYtNDEwMDZiMDgyMjE3IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImF1ZCI6WyJ3d3cuYXV0aHNlcnZlci5jb20iLCJ3d3cubWluaWFwaTEuY29tIiwid3d3Lm1pbmlhcGkyLmNvbSJdLCJuYmYiOjE3NTc0OTYyOTQsImV4cCI6MTc1NzQ5NjU5NCwiaXNzIjoid3d3LmF1dGhzZXJ2ZXIuY29tIn0.IMQD8Y48odhJivcGBhNf3gPCRcqkCGBJciqaVwuTsbM
 
 ### Token olustur
 POST http://localhost:5294/api/Auth/CreateToken
 Content-Type: application/json
 
 {
-  "email": "afaruk59@gmail.com",
-  "password": "Afaruk59**"
+  "email": "afkurtkadiroglu@gmail.com",
+  "password": "YeniSifre123**"
 }
 ### kullanıcı olustur
 POST http://localhost:5294/api/User/CreateUser
 Content-Type: application/json
 
 {
-  "userName": "suhis",
-  "email": "suhis@gmail.com",
-  "password": "Suhis123**"
+  "userName": "ahmetfaruk",
+  "email": "ahmet@mudbey.com.tr"
+}
+### Kaydı tamamlama (geçici şifre e-postadan gelir)
+POST http://localhost:5294/api/User/CompleteRegistration
+Content-Type: application/json
+
+{
+  "email": "ahmet@mudbey.com.tr",
+  "temporaryPassword": "2xmR5yt&tG",
+  "newPassword": "YeniSifre123**"
 }
 ### Refresh ile token yenileme
 POST http://localhost:5294/api/Auth/CreateTokenByRefreshToken

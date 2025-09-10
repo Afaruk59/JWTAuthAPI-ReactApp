@@ -26,6 +26,7 @@ builder.Services.UseCustomValidationResponse();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOption"));
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
 
 builder.Services.AddAuthentication(options =>
@@ -69,6 +70,7 @@ builder.Services.AddIdentityCore<UserApp>(Opt =>
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 var app = builder.Build();
 

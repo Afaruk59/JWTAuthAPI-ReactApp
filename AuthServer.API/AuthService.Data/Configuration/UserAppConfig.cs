@@ -14,5 +14,9 @@ public class UserAppConfig : IEntityTypeConfiguration<UserApp>
             .IsRequired()
             .HasMaxLength(50)
             .HasDefaultValue("User");
+
+        builder.Property(x => x.IsRegistrationCompleted)
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }
