@@ -54,7 +54,6 @@ function LoginPage() {
           sessionStorage.setItem("refreshToken", refresh);
         }
 
-        // Layout ve diğer bileşenlerin anında güncellemesi için event yayınla
         window.dispatchEvent(new Event("auth-changed"));
 
         const role = decodeRole(access);
