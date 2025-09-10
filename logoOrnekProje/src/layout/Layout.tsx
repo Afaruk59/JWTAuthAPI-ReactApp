@@ -268,7 +268,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           {children}
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          Mudbey Yazılım ©{new Date().getFullYear()} Created by Afaruk59
         </Footer>
       </Layout>
     </Layout>

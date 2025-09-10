@@ -31,9 +31,22 @@ public class UserController : CustomBaseControler
     {
         return ActionResultInstance(await _userService.GetUserByNameAsync(HttpContext.User.Identity.Name));
     }
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
     [HttpPost("{userName}/{roleName}")]
     public async Task<IActionResult> AssignRole(string userName, string roleName)
     {
         return ActionResultInstance(await _userService.AssignRoleToUser(userName, roleName));
+    }
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        return ActionResultInstance(await _userService.GetAllUsersAsync());
+    }
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+    [HttpDelete("{userName}")]
+    public async Task<IActionResult> DeleteUser(string userName)
+    {
+        return ActionResultInstance(await _userService.DeleteUserAsync(userName));
     }
 }

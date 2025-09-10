@@ -5,6 +5,7 @@ using AuthServer.Core.Dtos;
 using Microsoft.AspNetCore.Http;
 using AuthServer.Core.Services;
 using SharedLibrary.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthServer.Service.Services;
 
@@ -138,6 +139,37 @@ public class UserService : IUserService
         if (!updateResult.Succeeded)
         {
             return Response<NoDataDto>.Fail(string.Join(",", updateResult.Errors.Select(x => x.Description)), 400, true);
+        }
+
+        return Response<NoDataDto>.Success(200);
+    }
+
+    public async Task<Response<IEnumerable<UserAppDto>>> GetAllUsersAsync()
+    {
+        var users = _userManager.Users.Select(u => new UserAppDto
+        {
+            Id = u.Id,
+            UserName = u.UserName!,
+            Email = u.Email!,
+            Role = u.Role,
+            IsRegistrationCompleted = u.IsRegistrationCompleted
+        });
+
+        return Response<IEnumerable<UserAppDto>>.Success(await users.ToListAsync(), 200);
+    }
+
+    public async Task<Response<NoDataDto>> DeleteUserAsync(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            return Response<NoDataDto>.Fail("User not found.", 404, true);
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            return Response<NoDataDto>.Fail(string.Join(",", result.Errors.Select(x => x.Description)), 400, true);
         }
 
         return Response<NoDataDto>.Success(200);
