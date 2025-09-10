@@ -1,13 +1,16 @@
 import { Form, Input, Button, message, Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useState } from "react";
 
 function RegisterPage() {
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_BASE_URL as string;
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (values: any) => {
     try {
+      setLoading(true);
       const { data } = await axios.post(`${apiUrl}/api/User/CreateUser`, {
         email: values.email,
         userName: values.username,
@@ -27,6 +30,8 @@ function RegisterPage() {
         error?.response?.data?.error?.errors?.join(", ") ??
         "Bir hata oluştu. Lütfen tekrar deneyin.";
       message.error(errMsg);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -68,7 +73,7 @@ function RegisterPage() {
         </Form.Item>
 
         <Form.Item style={{ display: "flex", justifyContent: "center" }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Kayıt Ol
           </Button>
         </Form.Item>

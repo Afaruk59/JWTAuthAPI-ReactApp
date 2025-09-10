@@ -5,10 +5,9 @@ import {
   TeamOutlined,
   UserAddOutlined,
   UserOutlined,
-  LockOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Layout, Menu, theme, Typography, Avatar, message } from "antd";
+import { Layout, Menu, theme, Typography, Avatar, message, Modal } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -22,25 +21,33 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const apiUrl = import.meta.env.VITE_API_BASE_URL as string;
 
   const logout = async () => {
-    try {
-      const refreshToken =
-        localStorage.getItem("refreshToken") ||
-        sessionStorage.getItem("refreshToken");
-      if (refreshToken) {
-        await axios.post(`${apiUrl}/api/Auth/RevokeRefreshToken`, {
-          token: refreshToken,
-        });
-      }
-    } catch {
-      // ignore
-    } finally {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      sessionStorage.removeItem("accessToken");
-      sessionStorage.removeItem("refreshToken");
-      message.success("Çıkış yapıldı");
-      navigate("/login", { replace: true });
-    }
+    Modal.confirm({
+      title: "Çıkış Yap",
+      content: "Çıkış yapmak istediğinize emin misiniz?",
+      onOk: async () => {
+        try {
+          const refreshToken =
+            localStorage.getItem("refreshToken") ||
+            sessionStorage.getItem("refreshToken");
+          if (refreshToken) {
+            await axios.post(`${apiUrl}/api/Auth/RevokeRefreshToken`, {
+              token: refreshToken,
+            });
+          }
+        } catch {
+          // ignore
+        } finally {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          sessionStorage.removeItem("accessToken");
+          sessionStorage.removeItem("refreshToken");
+          setUserInfo(null);
+          window.dispatchEvent(new Event("auth-changed"));
+          message.success("Çıkış yapıldı");
+          navigate("/login", { replace: true });
+        }
+      },
+    });
   };
   const siderStyle: React.CSSProperties = {
     overflow: "auto",
@@ -57,7 +64,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     const accessToken =
       localStorage.getItem("accessToken") ||
       sessionStorage.getItem("accessToken");
-    if (!accessToken) return;
+    if (!accessToken) {
+      setUserInfo(null);
+      return;
+    }
     const { data } = await axios.get(`${apiUrl}/api/User/GetUser`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -65,6 +75,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   };
   useEffect(() => {
     getUserInfo();
+    const handler = () => getUserInfo();
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
   }, []);
 
   const getSidebarItems = (): MenuProps["items"] => {

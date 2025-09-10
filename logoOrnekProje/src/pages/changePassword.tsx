@@ -1,13 +1,16 @@
 import { Form, Input, Button, message, Typography } from "antd";
 import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ChangePassword() {
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_BASE_URL as string;
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (values: any) => {
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${apiUrl}/api/User/CompleteRegistration`,
         {
@@ -29,6 +32,8 @@ function ChangePassword() {
         error?.response?.data?.error?.errors?.join(", ") ??
         "Bir hata oluştu. Lütfen tekrar deneyin.";
       message.error(errMsg);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -103,7 +108,7 @@ function ChangePassword() {
         </Form.Item>
 
         <Form.Item style={{ display: "flex", justifyContent: "center" }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Şifre Değiştir
           </Button>
         </Form.Item>

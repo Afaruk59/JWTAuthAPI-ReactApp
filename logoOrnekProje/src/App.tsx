@@ -62,7 +62,6 @@ function App() {
           if (access) localStorage.setItem("accessToken", access);
           if (refresh) localStorage.setItem("refreshToken", refresh);
 
-          // Yalnızca root veya login/register/changePassword sayfasındaysak yönlendir
           const role = access ? decodeRole(access) : null;
           const path = location.pathname.toLowerCase();
           const isPublic = [
@@ -91,7 +90,6 @@ function App() {
     };
 
     bootstrap();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (bootstrapping) return null;
