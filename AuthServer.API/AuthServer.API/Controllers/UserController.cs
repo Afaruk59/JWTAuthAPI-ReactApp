@@ -20,6 +20,13 @@ public class UserController : CustomBaseControler
     {
         return ActionResultInstance(await _userService.CreateUserAsync(createUserDto));
     }
+    
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+    [HttpPost]
+    public async Task<IActionResult> CreateUserByAdmin(CreateUserByAdminDto createUserByAdminDto)
+    {
+        return ActionResultInstance(await _userService.CreateUserByAdminAsync(createUserByAdminDto));
+    }
     [HttpPost]
     public async Task<IActionResult> CompleteRegistration(CompleteRegistrationDto dto)
     {

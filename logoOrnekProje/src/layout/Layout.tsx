@@ -79,6 +79,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     window.addEventListener("auth-changed", handler);
     return () => window.removeEventListener("auth-changed", handler);
   }, []);
+  useEffect(() => {
+    getUserInfo();
+  }, [pathname]);
 
   const getSidebarItems = (): MenuProps["items"] => {
     const currentPath = pathname;

@@ -62,6 +62,8 @@ function App() {
           if (access) localStorage.setItem("accessToken", access);
           if (refresh) localStorage.setItem("refreshToken", refresh);
 
+          window.dispatchEvent(new Event("auth-changed"));
+
           const role = access ? decodeRole(access) : null;
           const path = location.pathname.toLowerCase();
           const isPublic = [
@@ -77,7 +79,6 @@ function App() {
             else navigate("/user/orders", { replace: true });
           }
         } else {
-          // Refresh başarısızsa temizle
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
         }

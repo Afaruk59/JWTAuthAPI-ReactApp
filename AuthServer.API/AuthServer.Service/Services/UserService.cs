@@ -43,7 +43,6 @@ public class UserService : IUserService
         }
         catch (Exception)
         {
-            // E-posta gönderimi başarısız olursa kullanıcıyı geri al
             await _userManager.DeleteAsync(user);
             return Response<UserAppDto>.Fail("E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.", 500, true);
         }
@@ -58,6 +57,40 @@ public class UserService : IUserService
         };
         return Response<UserAppDto>.Success(userDto, 200);
     }
+
+    public async Task<Response<UserAppDto>> CreateUserByAdminAsync(CreateUserByAdminDto createUserByAdminDto)
+    {
+        string[] validRoles = { "User", "Manager", "Admin" };
+        if (!validRoles.Contains(createUserByAdminDto.Role))
+        {
+            return Response<UserAppDto>.Fail($"Invalid role: {createUserByAdminDto.Role}. Valid roles: {string.Join(", ", validRoles)}", 400, true);
+        }
+
+        var user = new UserApp 
+        { 
+            UserName = createUserByAdminDto.UserName, 
+            Email = createUserByAdminDto.Email,
+            Role = createUserByAdminDto.Role,
+            IsRegistrationCompleted = true
+        };
+
+        var result = await _userManager.CreateAsync(user, createUserByAdminDto.Password);
+        if (!result.Succeeded)
+        {
+            return Response<UserAppDto>.Fail(string.Join(",", result.Errors.Select(x => x.Description)), 400, true);
+        }
+
+        var userDto = new UserAppDto
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            Role = user.Role,
+            IsRegistrationCompleted = user.IsRegistrationCompleted
+        };
+        return Response<UserAppDto>.Success(userDto, 200);
+    }
+
     public async Task<Response<UserAppDto>> GetUserByNameAsync(string UserName)
     {
         var user = await _userManager.FindByNameAsync(UserName);
@@ -78,7 +111,6 @@ public class UserService : IUserService
 
     public async Task<Response<NoDataDto>> AssignRoleToUser(string userName, string roleName)
     {
-        // Geçerli rol kontrolü
         string[] validRoles = { "User", "Manager", "Admin" };
         if (!validRoles.Contains(roleName))
         {
@@ -91,13 +123,11 @@ public class UserService : IUserService
             return Response<NoDataDto>.Fail("User not found.", 404, true);
         }
 
-        // Rol zaten atanmış mı kontrol et
         if (user.Role == roleName)
         {
             return Response<NoDataDto>.Fail($"User already has role: {roleName}", 400, true);
         }
 
-        // Kullanıcının rolünü güncelle (tek rol sistemi)
         user.Role = roleName;
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
@@ -177,7 +207,6 @@ public class UserService : IUserService
 
     private static string GenerateTemporaryPassword()
     {
-        // Kimlik varsayılan politikası: min 6, en az 1 büyük, 1 küçük, 1 rakam (NonAlpha opsiyonel)
         const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
         const string lower = "abcdefghijkmnopqrstuvwxyz";
         const string digits = "23456789";
@@ -188,7 +217,6 @@ public class UserService : IUserService
         System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
 
         var pwd = new char[TemporaryPasswordLength];
-        // En az birinden garanti et
         pwd[0] = upper[bytes[0] % upper.Length];
         pwd[1] = lower[bytes[1] % lower.Length];
         pwd[2] = digits[bytes[2] % digits.Length];
@@ -197,7 +225,6 @@ public class UserService : IUserService
         {
             pwd[i] = all[bytes[i] % all.Length];
         }
-        // Karıştır
         return new string(pwd.OrderBy(_ => Guid.NewGuid()).ToArray());
     }
 }
