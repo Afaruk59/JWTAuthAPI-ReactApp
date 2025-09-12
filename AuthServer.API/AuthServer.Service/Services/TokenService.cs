@@ -43,7 +43,7 @@ public class TokenService : ITokenService
             new(JwtRegisteredClaimNames.Email, userApp.Email ?? ""),
             new(ClaimTypes.Name, userApp.UserName ?? ""),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(ClaimTypes.Role, userApp.Role) // Basit rol property'sini kullan
+            new(ClaimTypes.Role, userApp.Role)  
         };
         
         userList.AddRange(audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));

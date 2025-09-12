@@ -27,8 +27,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy("react", p => p
-        .WithOrigins("http://localhost:5173")
+    opt.AddPolicy("react", policy => policy
+        .WithOrigins("https://localhost:5173", "http://localhost:5173")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials());
@@ -43,16 +43,23 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opts =>
 {
+    opts.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     opts.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
     {
         ValidIssuer = tokenOptions.Issuer,
-        ValidAudience = tokenOptions.Audience?[0],
+        ValidAudiences = tokenOptions.Audience,
         IssuerSigningKey = SignService.GetSymmetricSecurityKey(tokenOptions.SecurityKey),
 
         ValidateIssuerSigningKey = true,
         ValidateAudience = true,
         ValidateIssuer = true,
         ValidateLifetime = true,
+        RequireSignedTokens = true,
+        RequireExpirationTime = true,
+
+        NameClaimType = System.Security.Claims.ClaimTypes.Name,
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role,
+
         ClockSkew = TimeSpan.Zero
     };
 });
@@ -68,7 +75,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     });
 });
 
-// Identity'yi sadece kullanıcı yönetimi için kullan, rol sistemi olmadan
 builder.Services.AddIdentityCore<UserApp>(Opt =>
 {
     Opt.User.RequireUniqueEmail = true;
@@ -82,11 +88,14 @@ builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 var app = builder.Build();
 
-// Rol sistemi artık kullanılmıyor - kaldırıldı
-
 app.UseCustomException();
 
-// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+app.UseHttpsRedirection();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -100,6 +109,6 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers();
+    _ = endpoints.MapControllers();
 });
 app.Run();
